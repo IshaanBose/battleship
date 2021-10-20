@@ -1,0 +1,9 @@
+All commands are executed considering pwd is the project directory.
+
+To compile into object files:
+> cd obj_windows
+> gcc -std=c99 -Wall -I../include -c ..\src\easy_io.c ..\src\game.c ..\src\main.c ..\src\player.c ..\src\cpu.c
+
+To create exe:
+> cd ..
+> gcc -std=c99 -Wall -I./include -o battleship_win64 .\obj_windows\easy_io.o .\obj_windows\game.o .\obj_windows\main.o .\obj_windows\player.o .\obj_windows\cpu.o
