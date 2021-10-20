@@ -2,6 +2,8 @@ Battleship
 ==========
 This is a program that allows users to play [Battleship](https://en.wikipedia.org/wiki/Battleship_(game)#Description) — a strategy type guessing game for 2 players. The game either be played against another player or the CPU.
 
+This program was written as part of my MCA program.
+
 Project Structure
 -----------------
 * include – contains all header files.
