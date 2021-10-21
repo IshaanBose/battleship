@@ -14,7 +14,12 @@ Scenario:
 #include <stdlib.h>
 #include <player.h>
 
+typedef enum {
+    EASY = 1,
+    HARD
+} Difficulty;
+
 void setCPUTurn(int turn);
 int getCPUTurn(void);
 void cpuPlaceShips(void);
-bool playCPUTurnEasy(char* moveStatus);
+bool playCPUTurn(char* moveStatus, Difficulty difficulty);

@@ -20,5 +20,5 @@ ________________________________________________________________________________
 // Functions
 
 void setCPUPlayer(bool isCPUPlayer);
-bool start(int playerTurn);
+bool start(int playerTurn, Difficulty difficulty);
 void convertToIndex(char* position, int* row, int* col);

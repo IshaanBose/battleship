@@ -14,7 +14,16 @@ ________________________________________________________________________________
 #include <cpu.h>
 #include <stdio.h>
 
-static int TURN = 0;
+int TURN = 0;
+
+// for hard difficulty
+short lastMove[2] = { 0, 0 }; // 1st element represents position, 2nd element represents miss (0) or hit (1).
+short hits[17]; // stores positions where there was a successful hit
+short potentialShip[5]; // stores positions of a potential ship
+bool orientation = false; // direction in which to guess: vertical = false, and horizontal = true
+
+bool playCPUTurnEasy(char* moveStatus);
+bool playCPUTurnHard(char* moveStatus);
 
 void setCPUTurn(int turn)
 {
@@ -90,6 +99,15 @@ void cpuPlaceShips()
     }
 }
 
+bool playCPUTurn(char* moveStatus, Difficulty difficulty)
+{
+    switch (difficulty)
+    {
+        case EASY: return playCPUTurnEasy(moveStatus);
+        case HARD: return playCPUTurnHard(moveStatus);
+    }
+}
+
 bool playCPUTurnEasy(char* moveStatus)
 {
     int row, col;
@@ -133,4 +151,26 @@ bool playCPUTurnEasy(char* moveStatus)
     }
 
     return checkWin(TURN);
+}
+
+/*
+    Algorithm based on: https://www.datagenetics.com/blog/december32011/index.html (Parity)
+*/
+bool playCPUTurnHard(char* moveStatus)
+{
+    int row, col;
+
+    if (!lastMove[1])
+    {
+        while (1)
+        {
+            row = rand() % 10; col = rand() % 10; // generate a random position on the board
+
+            if ((row + col) % 2 == 0) // making sure to only hit odd cells
+                continue;
+
+            if (players[TURN].actionBoard[row][col] == ' ') // if CPU hasn't guessed that position yet
+                break;
+        }
+    }
 }

@@ -45,7 +45,7 @@ short PLAYER_TURN = 0;
 void takePosition(char* positionArr, char* positionPrompt);
 bool validatePosition(char* position);
 void placeShips(void);
-bool play(void);
+bool play(Difficulty difficulty);
 bool playTurn(void);
 void resetVariables(void);
 
@@ -62,7 +62,7 @@ void setCPUPlayer(bool isCPUPlayer)
     -------
     Returns `true` if after finishing the current game, player(s) want to keep playing, else it returns `false`.
 */
-bool start(int playerTurn)
+bool start(int playerTurn, Difficulty difficulty)
 {
     if (CPU_PLAYER)
     {
@@ -98,7 +98,7 @@ bool start(int playerTurn)
         PLAYER_TURN = 1;
     }
 
-    return play();
+    return play(difficulty);
 }
 
 /*
@@ -108,7 +108,7 @@ bool start(int playerTurn)
     -------
     Returns `true` if player(s) want to keep playing after finishing the game, else it returns `false`.
 */
-bool play()
+bool play(Difficulty difficulty)
 {
     PLAYER_TURN = 1;
     bool showBoard = false, playUserTurn = false;
@@ -119,7 +119,7 @@ bool play()
         {
             if ((getCPUTurn() + 1) == PLAYER_TURN) // if it is CPU's turn
             {
-                if (playCPUTurnEasy(&OPPONENT_MOVE)) // if CPU wins
+                if (playCPUTurn(&OPPONENT_MOVE, difficulty)) // if CPU wins
                 {
                     printf("CPU Wins!\n");
                     resetVariables();
