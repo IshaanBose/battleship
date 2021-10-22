@@ -23,3 +23,5 @@ void setCPUTurn(int turn);
 int getCPUTurn(void);
 void cpuPlaceShips(void);
 bool playCPUTurn(char* moveStatus, Difficulty difficulty);
+void resetCPUVariables();
+void testCPU();

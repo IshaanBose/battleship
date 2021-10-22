@@ -25,9 +25,10 @@ ________________________________________________________________________________
 #include <game.h>
 #include <ctype.h>
 #include <time.h>
+// #include <stack.h>
 
 void initMenu();
-void chooseDifficulty(Difficulty* difficulty);
+void chooseDifficulty(short* difficulty);
 
 int main()
 {
@@ -85,7 +86,7 @@ void initMenu()
                     
                     case 2:
                     {
-                        Difficulty difficulty;
+                        short difficulty;
                         chooseDifficulty(&difficulty);
 
                         if (difficulty == 3)
@@ -122,7 +123,7 @@ void initMenu()
                         createPlayer(playerTurn, false);
                         clearScreen();
                         
-                        keepPlaying = start(playerTurn, difficulty);
+                        keepPlaying = start(playerTurn, difficulty == 1 ? EASY : HARD);
 
                         break;
                     }
@@ -155,7 +156,7 @@ void initMenu()
     }
 }
 
-void chooseDifficulty(Difficulty* difficulty)
+void chooseDifficulty(short* difficulty)
 {
     printBanner();
     printf("\nChoose difficulty:\n1. Easy\n2. Hard\n3. Go back\n");
@@ -165,7 +166,7 @@ void chooseDifficulty(Difficulty* difficulty)
         while (!checkInputValidity(
             takeNInputWithPropmt("Enter difficulty: ", difficulty, SHORT, 1),
             NULL, "Enter only one number.", "Enter only a number.", NULL ));
-        
+        printf("Difficulty: %d\n", *difficulty);
         if (*difficulty < 1 || *difficulty > 3)
         {
             printf("Enter only numbers from 1 - 3.\n");

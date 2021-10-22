@@ -7,7 +7,7 @@ SRCDIR = src
 
 MAIN = battleship_64
 
-_SRCS = easy_io.c main.c player.c game.c cpu.c
+_SRCS = easy_io.c main.c player.c game.c cpu.c stack.c
 SRCS = $(patsubst %,$(SRCDIR)/%,$(_SRCS))
 
 # This uses Suffix Replacement within a macro:

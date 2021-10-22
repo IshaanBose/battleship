@@ -113,38 +113,49 @@ bool play(Difficulty difficulty)
     PLAYER_TURN = 1;
     bool showBoard = false, playUserTurn = false;
 
-    while (1) // this loop will never be brokenn instead, control will be returned only after one of the players win.
+    while (1) // this loop will never be broken instead, control will be returned only after one of the players win.
     {
-        if (CPU_PLAYER)
+        if (CPU_PLAYER && (getCPUTurn() + 1) == PLAYER_TURN) // if it is CPU's turn
         {
-            if ((getCPUTurn() + 1) == PLAYER_TURN) // if it is CPU's turn
+            if (playCPUTurn(&OPPONENT_MOVE, difficulty)) // if CPU wins
             {
-                if (playCPUTurn(&OPPONENT_MOVE, difficulty)) // if CPU wins
-                {
-                    printf("CPU Wins!\n");
-                    resetVariables();
+                char merged[BOARD_SIZE][BOARD_SIZE];
+                clearScreen();
 
-                    char playAgain;
+                for (int i = 0; i < 2; i++)
+                {
+                    printf("%s's board status:\n", players[i].name);
+                    mergeBoards(players[i].board, players[(i + 1) % 2].actionBoard, merged);
+                    displayBoard(merged);
+                    printf("%s's action board:\n", players[i].name);
+                    displayBoard(players[i].actionBoard);
+                    printf("\n\n");
+                }
                 
-                    while (1) // loop breaks after valid input ('Y' / 'N')
-                    {
-                        while (!checkInputValidity(
-                            takeNInputWithPropmt("Play again? (Y/N): ", &playAgain, CHAR, 1),
-                            NULL, "Please enter only 'Y' or 'N'.", NULL, NULL ));
-                        
-                        playAgain = tolower(playAgain);
+                printf("CPU Wins!\n");
+                resetVariables();
+                resetCPUVariables();
 
-                        if (playAgain != 'y' && playAgain != 'n')
-                            printf("Please enter only 'Y' or 'N'.\n");
-                        else
-                            return playAgain == 'y';
-                    }
-                }
-                else
+                char playAgain;
+            
+                while (1) // loop breaks after valid input ('Y' / 'N')
                 {
-                    PLAYER_TURN = PLAYER_TURN == 1 ? PLAYER_TURN + 1 : PLAYER_TURN - 1; // next player's turn
-                    continue;
+                    while (!checkInputValidity(
+                        takeNInputWithPropmt("Play again? (Y/N): ", &playAgain, CHAR, 1),
+                        NULL, "Please enter only 'Y' or 'N'.", NULL, NULL ));
+                    
+                    playAgain = tolower(playAgain);
+
+                    if (playAgain != 'y' && playAgain != 'n')
+                        printf("Please enter only 'Y' or 'N'.\n");
+                    else
+                        return playAgain == 'y';
                 }
+            }
+            else
+            {
+                PLAYER_TURN = PLAYER_TURN == 1 ? PLAYER_TURN + 1 : PLAYER_TURN - 1; // next player's turn
+                continue;
             }
         }
 
@@ -161,6 +172,26 @@ bool play(Difficulty difficulty)
         {
             if (playTurn()) // if one of the players win
             {
+                char merged[BOARD_SIZE][BOARD_SIZE];
+                clearScreen();
+
+                for (int i = 0; i < 2; i++)
+                {
+                    // if (i == 1)
+                    // {
+                    //     for (int j = 0; j < BOARD_SIZE; j++)
+                    //         for (int k = 0; k < BOARD_SIZE; k++)
+                    //             merged[j][k] = ' ';
+                    // }
+
+                    printf("%s's board status:\n", players[i].name);
+                    mergeBoards(players[i].board, players[(i + 1) % 2].actionBoard, merged);
+                    displayBoard(merged);
+                    printf("%s's action board:\n", players[i].name);
+                    displayBoard(players[i].actionBoard);
+                    printf("\n\n");
+                }
+
                 printf("%s wins!\n", players[PLAYER_TURN - 1].name);
                 resetVariables();
                 
@@ -189,6 +220,34 @@ bool play(Difficulty difficulty)
 
         printf("\nOpponent's last move: ");
         printf(OPPONENT_MOVE != '\0' ? (OPPONENT_MOVE == 'H' ? "HIT!" : "MISS!") : "Not played");
+        printf("\nOpponent ships left: ");
+
+        for (int i = 0; i < SHIPS; i++)
+        {
+            if (players[PLAYER_TURN % 2].shipsHP[i] != 0)
+            {
+                switch (i)
+                {
+                    case CARRIER:
+                        printf("Carrier ");
+                        break;
+                    case BATTLESHIP:
+                        printf("Battleship ");
+                        break;
+                    case DESTROYER:
+                        printf("Destroyer ");
+                        break;
+                    case SUBMARINE:
+                        printf("Submarine ");
+                        break;
+                    case PATROL:
+                        printf("Patrol ");
+                        break;
+                }
+            }
+        }
+
+        printf("\n");
         printf("\n1. Play Turn\n2. Show my board's status\n");
 
         while (1) // breaks after valid input (1 / 2)
