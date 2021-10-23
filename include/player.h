@@ -35,9 +35,10 @@ Scenario:
     ---------
     1. void createPlayer(int playerNum, bool createCPU)
     2. void displayBoard(char board[BOARD_SIZE][BOARD_SIZE])
-    3. bool placeShipOnBoard(int playerNum, char* startingPosition, char* endingPosition, Ships ship)
-    4. bool checkWin(int playerTurn)
-    5. void mergeBoards(
+    3. bool canPlaceShipOnBoard(int playerNum, char* startingPosition, char* endingPosition, Ships ship)
+    4. bool placeShipOnBoard(int playerNum, int *startArr, int *endArr, Ships ship)
+    5. bool checkWin(int playerTurn)
+    6. void mergeBoards(
             char playerBoard[BOARD_SIZE][BOARD_SIZE], 
             char opponentActionBoard[BOARD_SIZE][BOARD_SIZE], 
             char merged[BOARD_SIZE][BOARD_SIZE]

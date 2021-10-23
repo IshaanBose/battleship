@@ -5,27 +5,24 @@ Author: Ishaan Bose
 Date of Creation: 2021-10-12
 ____________________________________________________________________________________________________________________________________ 
 
-Scenario:
-
     Contains functions that allows for interaction with player properties.
 
     INCLUDES (user-defined)
     -----------------------
-    1. easy_io.h
-    2. player.h
-    3. game.h
+    game.h
 
     GLOBAL VARIABLE
     ---------------
-    1. struct Player players[]
+    struct Player players[]
 
     FUNCTIONS (global)
     ------------------
     1. void createPlayer(int playerNum, bool createCPU)
     2. void displayBoard(char board[BOARD_SIZE][BOARD_SIZE])
     3. bool canPlaceShipOnBoard(int playerNum, char* startingPosition, char* endingPosition, Ships ship)
-    4. bool checkWin(int playerTurn)
-    5. void mergeBoards(
+    4. bool placeShipOnBoard(int playerNum, int *startArr, int *endArr, Ships ship)
+    5. bool checkWin(int playerTurn)
+    6. void mergeBoards(
             char playerBoard[BOARD_SIZE][BOARD_SIZE], 
             char opponentActionBoard[BOARD_SIZE][BOARD_SIZE], 
             char merged[BOARD_SIZE][BOARD_SIZE]
@@ -207,17 +204,17 @@ void mergeBoards(
 
 
 /*
-    This function places the specified ship between the specified positions.
+    This function checks whether the given positions can fit the given ship and place it if does.
 
     Parameters
     ----------
     `int playerNum`:
-        Contains player number (1 oe 2).
+        Contains player number (1 or 2).
     
-    `char* startingPosition`:
+    `char *startingPosition`:
         Starting coordinates from where to start placing the ship.
 
-    `char* endingPosition`:
+    `char *endingPosition`:
         Ending coordinates from where to stop placing the ship.
 
     `Ships ships`:
@@ -227,7 +224,7 @@ void mergeBoards(
     -------
     Returns `true` if the ship was successfully placed on the player's board, else it returns `false`.
 */
-bool canPlaceShipOnBoard(int playerNum, char* startingPosition, char* endingPosition, Ships ship)
+bool canPlaceShipOnBoard(int playerNum, char *startingPosition, char *endingPosition, Ships ship)
 {
     int startRow, startCol, endRow, endCol, temp;
     int startArr[2], endArr[2];
@@ -271,6 +268,23 @@ bool canPlaceShipOnBoard(int playerNum, char* startingPosition, char* endingPosi
     return placeShipOnBoard(playerNum, startArr, endArr, ship);
 }
 
+/*
+    Places the specified ship on the board between the specified positions.
+
+    Parameters
+    ----------
+    `int playerNum`:
+        Contains player number (1 or 2).
+    
+    `char *startingPosition`:
+        Starting coordinates from where to start placing the ship.
+
+    `char *endingPosition`:
+        Ending coordinates from where to stop placing the ship.
+
+    `Ships ships`:
+        Ship to place.
+*/
 bool placeShipOnBoard(int playerNum, int *startArr, int *endArr, Ships ship)
 {
     char shipIcon = '\0';

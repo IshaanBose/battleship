@@ -7,10 +7,16 @@ ________________________________________________________________________________
 
     Header file for game.c.
 
+    INCLUDES
+    --------
+    1. easy_io.h
+    2. cpu.h
+
     FUNCTIONS
     ---------
-    1. bool start(void)
-    2. void convertToIndex(char* position, int* row, int* col)
+    1. void setCPUPlayer(void)
+    2. bool start(int playerTurn, Difficulty difficulty)
+    3. void convertToIndex(char* position, int* row, int* col)
 
 */
 
@@ -19,6 +25,6 @@ ________________________________________________________________________________
 
 // Functions
 
-void setCPUPlayer(bool isCPUPlayer);
+void setCPUPlayer(void);
 bool start(int playerTurn, Difficulty difficulty);
 void convertToIndex(char* position, int* row, int* col);

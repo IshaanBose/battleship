@@ -9,27 +9,28 @@ ________________________________________________________________________________
 
     INCLUDES (user-defined)
     -----------------------
-    1. easy_io.h
-    2. player.h
-    3. game.h
+    game.h
 
-    GLOBAL VARIABLE
-    ---------------
-    1. char OPPPONENT_MOVE
+    GLOBAL VARIABLES
+    ----------------
+    1. char _opponentMove
+    2. bool _cpuPlayer
+    3. short _playerTurn
 
     FUNCTIONS (Global)
     ------------------
-    1. bool start(void)
-    2. void convertToIndex(char* position, int* row, int* col)
+    1. void setCPUPlayer(bool isCPUPlayer)
+    2. bool start(int playerTurn, Difficulty difficulty)
+    3. void convertToIndex(char *position, int *row, int *col)
 
     FUNCTIONS (Local)
     -----------------
-    1. bool start()
-    2. void takePosition(char* positionArr, char* positionPrompt)
-    3. bool validatePosition(char* position)
-    4. void placeShips(int playerNum)
-    5. bool play(void)
-    6. bool playTurn(int playerTurn)
+    1. void takePosition(char *positionArr, char *positionPrompt)
+    2. bool validatePosition(char *position)
+    3. void placeShips(void)
+    4. bool play(Difficulty difficulty)
+    5. bool playTurn(void)
+    6. void resetVariables(void)
 
 *Compiled using C99 standards*
 
@@ -38,25 +39,39 @@ ________________________________________________________________________________
 #include <game.h>
 #include <ctype.h>
 
-char OPPONENT_MOVE = '\0'; // stores the status of the most recent move made by a player
-bool CPU_PLAYER = false;
-short PLAYER_TURN = 0;
+// stores the status of the most recent move made by a player
+char _opponentMove = '\0';
+// stores whether or not there is a CPU player
+bool _cpuPlayer = false;
+// stores the player turn value, it is 0 initially, else it is either 1 or 2
+short _playerTurn = 0;
 
-void takePosition(char* positionArr, char* positionPrompt);
-bool validatePosition(char* position);
+void takePosition(char *positionArr, char *positionPrompt);
+bool validatePosition(char *position);
 void placeShips(void);
 bool play(Difficulty difficulty);
 bool playTurn(void);
 void resetVariables(void);
 
-void setCPUPlayer(bool isCPUPlayer)
+/*
+    Sets the CPU player.
+*/
+void setCPUPlayer()
 {
-    CPU_PLAYER = isCPUPlayer;
+    _cpuPlayer = true;
 }
 
 /*
     This functions starts the actual game of battleship. The function contains code that allows players to 
     place all their ships.
+
+    Parameters
+    ----------
+    `int playerTurn`:
+        Contains the user player's turn if CPU player was set.
+    
+    `Difficulty difficulty`:
+        Stores the difficulty of the CPU is there is a CPU player.
 
     Returns
     -------
@@ -64,14 +79,14 @@ void setCPUPlayer(bool isCPUPlayer)
 */
 bool start(int playerTurn, Difficulty difficulty)
 {
-    if (CPU_PLAYER)
+    if (_cpuPlayer)
     {
         cpuPlaceShips(); // CPU places ships
 
         // player turn
-        PLAYER_TURN = playerTurn;
+        _playerTurn = playerTurn;
         placeShips();
-        displayBoard(players[PLAYER_TURN - 1].board);
+        displayBoard(players[_playerTurn - 1].board);
 
         printf("All ships placed! Press any key to continue...");
         getchar();
@@ -81,7 +96,7 @@ bool start(int playerTurn, Difficulty difficulty)
     {
         for (int i = 1; i <= 2; i++)
         {
-            PLAYER_TURN = i;
+            _playerTurn = i;
             placeShips();
             displayBoard(players[i - 1].board);
 
@@ -95,7 +110,7 @@ bool start(int playerTurn, Difficulty difficulty)
             clearScreen();
         }
 
-        PLAYER_TURN = 1;
+        _playerTurn = 1;
     }
 
     return play(difficulty);
@@ -104,20 +119,25 @@ bool start(int playerTurn, Difficulty difficulty)
 /*
     This function contains code to actually play the game.
 
+    Parameter
+    ---------
+    `Difficulty difficulty`:
+        Stores the difficulty of the CPU is there is a CPU player.
+
     Returns
     -------
     Returns `true` if player(s) want to keep playing after finishing the game, else it returns `false`.
 */
 bool play(Difficulty difficulty)
 {
-    PLAYER_TURN = 1;
+    _playerTurn = 1;
     bool showBoard = false, playUserTurn = false;
 
     while (1) // this loop will never be broken instead, control will be returned only after one of the players win.
     {
-        if (CPU_PLAYER && (getCPUTurn() + 1) == PLAYER_TURN) // if it is CPU's turn
+        if (_cpuPlayer && (getCPUTurn() + 1) == _playerTurn) // if it is CPU's turn
         {
-            if (playCPUTurn(&OPPONENT_MOVE, difficulty)) // if CPU wins
+            if (playCPUTurn(&_opponentMove, difficulty)) // if CPU wins
             {
                 char merged[BOARD_SIZE][BOARD_SIZE];
                 clearScreen();
@@ -154,17 +174,17 @@ bool play(Difficulty difficulty)
             }
             else
             {
-                PLAYER_TURN = PLAYER_TURN == 1 ? PLAYER_TURN + 1 : PLAYER_TURN - 1; // next player's turn
+                _playerTurn = _playerTurn == 1 ? _playerTurn + 1 : _playerTurn - 1; // next player's turn
                 continue;
             }
         }
 
-        printf("Player %d's turn (%s):\n", PLAYER_TURN, players[PLAYER_TURN - 1].name);
+        printf("Player %d's turn (%s):\n", _playerTurn, players[_playerTurn - 1].name);
 
         if (showBoard)
         {
             char mergedBoard[BOARD_SIZE][BOARD_SIZE];
-            mergeBoards(players[PLAYER_TURN - 1].board, players[PLAYER_TURN % 2].actionBoard, mergedBoard);
+            mergeBoards(players[_playerTurn - 1].board, players[_playerTurn % 2].actionBoard, mergedBoard);
             displayBoard(mergedBoard);
             showBoard = false;
         }
@@ -177,13 +197,6 @@ bool play(Difficulty difficulty)
 
                 for (int i = 0; i < 2; i++)
                 {
-                    // if (i == 1)
-                    // {
-                    //     for (int j = 0; j < BOARD_SIZE; j++)
-                    //         for (int k = 0; k < BOARD_SIZE; k++)
-                    //             merged[j][k] = ' ';
-                    // }
-
                     printf("%s's board status:\n", players[i].name);
                     mergeBoards(players[i].board, players[(i + 1) % 2].actionBoard, merged);
                     displayBoard(merged);
@@ -192,7 +205,7 @@ bool play(Difficulty difficulty)
                     printf("\n\n");
                 }
 
-                printf("%s wins!\n", players[PLAYER_TURN - 1].name);
+                printf("%s wins!\n", players[_playerTurn - 1].name);
                 resetVariables();
                 
                 char playAgain;
@@ -213,18 +226,18 @@ bool play(Difficulty difficulty)
             }
 
             playUserTurn = false;
-            PLAYER_TURN = PLAYER_TURN == 1 ? PLAYER_TURN + 1 : PLAYER_TURN - 1; // next player's turn
+            _playerTurn = _playerTurn == 1 ? _playerTurn + 1 : _playerTurn - 1; // next player's turn
             clearScreen();
             continue;
         }
 
         printf("\nOpponent's last move: ");
-        printf(OPPONENT_MOVE != '\0' ? (OPPONENT_MOVE == 'H' ? "HIT!" : "MISS!") : "Not played");
+        printf(_opponentMove != '\0' ? (_opponentMove == 'H' ? "HIT!" : "MISS!") : "Not played");
         printf("\nOpponent ships left: ");
 
         for (int i = 0; i < SHIPS; i++)
         {
-            if (players[PLAYER_TURN % 2].shipsHP[i] != 0)
+            if (players[_playerTurn % 2].shipsHP[i] != 0)
             {
                 switch (i)
                 {
@@ -286,11 +299,6 @@ bool play(Difficulty difficulty)
 
 /*
     This function allows player to make a guess at where the opponent's ship is located.
-
-    Parameter
-    ---------
-    `int playerTurn`:
-        Contains player turn number (1 oe 2).
     
     Returns
     -------
@@ -298,7 +306,7 @@ bool play(Difficulty difficulty)
 */
 bool playTurn()
 {
-    int playerTurn = PLAYER_TURN - 1; // converting to index friendly number
+    int playerTurn = _playerTurn - 1; // converting to index friendly number
     char position[4];
     int row, col;
 
@@ -321,7 +329,7 @@ bool playTurn()
     }
 
     bool hit = false, shipSunk = false;
-    char* sunkenShip;
+    char *sunkenShip;
 
     // checking if the location at which the guess was made contains a part of a ship
     if (players[(playerTurn + 1) % 2].board[row][col] != ' ')
@@ -382,7 +390,7 @@ bool playTurn()
     printf("Player %d's turn (%s):\n", playerTurn + 1, players[playerTurn].name);
     displayBoard(players[playerTurn].actionBoard);
     printf(hit ? "\nHIT!\n" : "\nMISS!\n");
-    OPPONENT_MOVE = hit ? 'H' : 'M';
+    _opponentMove = hit ? 'H' : 'M';
 
     if (shipSunk)
     {
@@ -397,11 +405,6 @@ bool playTurn()
 
 /*
     This functions prompts the user to place all the available ships.
-
-    Parameter
-    ---------
-    `int playerNum`:
-        Contains player number (1 oe 2).
 */
 void placeShips()
 {
@@ -410,8 +413,8 @@ void placeShips()
 
     while (shipsPlaced < 5)
     {
-        printf("For %s:\n", players[PLAYER_TURN - 1].name);
-        displayBoard(players[PLAYER_TURN - 1].board);
+        printf("For %s:\n", players[_playerTurn - 1].name);
+        displayBoard(players[_playerTurn - 1].board);
 
         printf("\nShips available:\n");
 
@@ -510,7 +513,7 @@ void placeShips()
             takePosition(startPosition, "starting ");
             takePosition(endPosition, "ending ");
 
-            if (canPlaceShipOnBoard(PLAYER_TURN, startPosition, endPosition, ship))
+            if (canPlaceShipOnBoard(_playerTurn, startPosition, endPosition, ship))
             {
                 breakLoop = 1;
                 shipsPlaced += 1;
@@ -526,14 +529,14 @@ void placeShips()
 
     Parameters
     ----------
-    `char* positionArr`:
+    `char *positionArr`:
         Array in which to store the valid position.
     
-    `char* positionPrompt`:
+    `char *positionPrompt`:
         Function prompts user with string "Enter %sposition (ex: A5): ". positionArr replaces %s in this 
         string.
 */
-void takePosition(char* positionArr, char* positionPrompt)
+void takePosition(char *positionArr, char *positionPrompt)
 {
     short breakLoop = 0;
 
@@ -556,14 +559,14 @@ void takePosition(char* positionArr, char* positionPrompt)
 
     Parameter
     ---------
-    `char* position`:
+    `char *position`:
         Position to validate.
     
     Returns
     -------
     Returns `true` if the position passed is valid, else returns `false`.
 */
-bool validatePosition(char* position)
+bool validatePosition(char *position)
 {
     bool flagCol = false, flagRow = false;
 
@@ -599,27 +602,30 @@ bool validatePosition(char* position)
 
     Parameters
     ----------
-    `char* position`:
+    `char *position`:
         The position to convert into index values.
     
-    `int* row`:
+    `int *row`:
         Variable in which to store the row value of the position.
     
-    `int* col`:
+    `int *col`:
         Variable in which to store the column value of the position.
 */
-void convertToIndex(char* position, int* row, int* col)
+void convertToIndex(char *position, int *row, int *col)
 {
     *col = ((int) toupper(*(position))) - 65;
     sscanf((position + 1), "%d", row); // converting number char into int
     *row -= 1;
 }
 
+/*
+    Resets all the global variables
+*/
 void resetVariables()
 {
-    OPPONENT_MOVE = '\0';
-    CPU_PLAYER = false;
-    PLAYER_TURN = 0;
+    _opponentMove = '\0';
+    _cpuPlayer = false;
+    _playerTurn = 0;
 
     for (int player = 0; player < 2; player++)
     {

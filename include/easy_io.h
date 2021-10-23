@@ -9,7 +9,7 @@ ________________________________________________________________________________
 
     INCLUDES
     --------
-    1. stdio.h
+    stdio.h
 
     ENUMS
     -----
@@ -18,17 +18,17 @@ ________________________________________________________________________________
 
     FUNCTIONS
     ---------
-    1. ReturnCode takeInput(void* inputVar, DataType type)
-    2. ReturnCode takeNInput(void* inputVar, DataType type, int inputSize)
-    3. ReturnCode takeInputWithPropmt(char* propmt, void* inputVar, DataType type)
-    4. ReturnCode takeNInputWithPropmt(char* propmt, void* inputVar, DataType type, int inputSize)
+    1. ReturnCode takeInput(void *inputVar, DataType type)
+    2. ReturnCode takeNInput(void *inputVar, DataType type, int inputSize)
+    3. ReturnCode takeInputWithPropmt(char *propmt, void *inputVar, DataType type)
+    4. ReturnCode takeNInputWithPropmt(char *propmt, void *inputVar, DataType type, int inputSize)
     5. void clearScreen(void)
     6. short checkInputValidity(
             ReturnCode returnCode, 
-            char* cannotReadMessage, 
-            char* tooLongMessage, 
-            char* invalidTypeMessage, 
-            char* notSupportedMessage
+            char *cannotReadMessage, 
+            char *tooLongMessage, 
+            char *invalidTypeMessage, 
+            char *notSupportedMessage
         )
 */
 
@@ -55,15 +55,15 @@ typedef enum {
 
 // Functions
 
-ReturnCode takeInput(void* inputVar, DataType type);
-ReturnCode takeNInput(void* inputVar, DataType type, int inputSize);
-ReturnCode takeInputWithPropmt(char* propmt, void* inputVar, DataType type);
-ReturnCode takeNInputWithPropmt(char* propmt, void* inputVar, DataType type, int inputSize);
+ReturnCode takeInput(void *inputVar, DataType type);
+ReturnCode takeNInput(void *inputVar, DataType type, int inputSize);
+ReturnCode takeInputWithPropmt(char *propmt, void *inputVar, DataType type);
+ReturnCode takeNInputWithPropmt(char *propmt, void *inputVar, DataType type, int inputSize);
 void clearScreen(void);
 short checkInputValidity(
     ReturnCode returnCode, 
-    char* cannotReadMessage, 
-    char* tooLongMessage, 
-    char* invalidTypeMessage,
-    char* notSupportedMessage
+    char *cannotReadMessage, 
+    char *tooLongMessage, 
+    char *invalidTypeMessage,
+    char *notSupportedMessage
 );

@@ -13,17 +13,17 @@ ________________________________________________________________________________
 
     FUNCTIONS (Global)
     ------------------
-    1. ReturnCode takeInput(void* inputVar, DataType type)
-    2. ReturnCode takeNInput(void* inputVar, DataType type, int inputSize)
-    3. ReturnCode takeInputWithPropmt(char* propmt, void* inputVar, DataType type)
-    4. ReturnCode takeNInputWithPropmt(char* propmt, void* inputVar, DataType type, int inputSize)
+    1. ReturnCode takeInput(void *inputVar, DataType type)
+    2. ReturnCode takeNInput(void *inputVar, DataType type, int inputSize)
+    3. ReturnCode takeInputWithPropmt(char *propmt, void *inputVar, DataType type)
+    4. ReturnCode takeNInputWithPropmt(char *propmt, void *inputVar, DataType type, int inputSize)
     5. void clearScreen(void)
     6. short checkInputValidity(
             ReturnCode returnCode, 
-            char* cannotReadMessage, 
-            char* tooLongMessage, 
-            char* invalidTypeMessage, 
-            char* notSupportedMessage
+            char *cannotReadMessage, 
+            char *tooLongMessage, 
+            char *invalidTypeMessage, 
+            char *notSupportedMessage
         )
 
 *Compiled using C99 standards*
@@ -33,7 +33,7 @@ ________________________________________________________________________________
 #include <easy_io.h>
 #include <stdlib.h>
 
-/* 
+/*
     This macro defines a function CLSCR() which contains system specific code to clear screen.
     Works for Windows and Linux OSs.
 */
@@ -50,7 +50,7 @@ ________________________________________________________________________________
 
     Parameters
     ----------
-    `void* inputVar`:
+    `void *inputVar`:
         A void pointer which contains memory address of variable in which to store user input.
     
    `DataType type`:
@@ -71,7 +71,7 @@ ________________________________________________________________________________
         `ERR_CANNOT_READ` - if for whatever reason, fgets was not able to reed from stdin.
         `ERR_DATATYPE_NOT_SUPPORTED` - if given value for type is not supported.
 */
-ReturnCode takeInput(void* inputVar, DataType type)
+ReturnCode takeInput(void *inputVar, DataType type)
 {
     return takeNInput(inputVar, type, 100);
 }
@@ -84,10 +84,10 @@ ReturnCode takeInput(void* inputVar, DataType type)
 
     Parameters
     ----------
-    `char* prompt`:
+    `char *prompt`:
         Contains the message to be printed before taking input.
 
-    `void* inputVar`:
+    `void *inputVar`:
         A void pointer which contains memory address of variable in which to store user input.
     
    `DataType type`:
@@ -108,7 +108,7 @@ ReturnCode takeInput(void* inputVar, DataType type)
         `ERR_CANNOT_READ` - if for whatever reason, fgets was not able to reed from stdin.
         `ERR_DATATYPE_NOT_SUPPORTED` - if given value for type is not supported.
 */
-ReturnCode takeInputWithPropmt(char* propmt, void* inputVar, DataType type)
+ReturnCode takeInputWithPropmt(char *propmt, void *inputVar, DataType type)
 {
     printf("%s", propmt);
     return takeInput(inputVar, type);
@@ -121,7 +121,7 @@ ReturnCode takeInputWithPropmt(char* propmt, void* inputVar, DataType type)
 
     Parameters
     ----------
-    `void* inputVar`:
+    `void *inputVar`:
         A void pointer which contains memory address of variable in which to store user input.
     
     `DataType type`:
@@ -146,7 +146,7 @@ ReturnCode takeInputWithPropmt(char* propmt, void* inputVar, DataType type)
         `ERR_DATATYPE_NOT_SUPPORTED` - if given value for type is not supported.
 
 */
-ReturnCode takeNInput(void* inputVar, DataType type, int inputSize)
+ReturnCode takeNInput(void *inputVar, DataType type, int inputSize)
 {
     char buffer[inputSize + 2];
     buffer[sizeof buffer - 1] = 'x';
@@ -197,10 +197,10 @@ ReturnCode takeNInput(void* inputVar, DataType type, int inputSize)
 
     Parameters
     ----------
-    `char* prompt`:
+    `char *prompt`:
         Contains the message to be printed before taking input.
 
-    `void* inputVar`:
+    `void *inputVar`:
         A void pointer which contains memory address of variable in which to store user input.
     
    `DataType type`:
@@ -224,7 +224,7 @@ ReturnCode takeNInput(void* inputVar, DataType type, int inputSize)
         `ERR_CANNOT_READ` - if for whatever reason, fgets was not able to reed from stdin.
         `ERR_DATATYPE_NOT_SUPPORTED` - if given value for type is not supported.
 */
-ReturnCode takeNInputWithPropmt(char* propmt, void* inputVar, DataType type, int inputSize)
+ReturnCode takeNInputWithPropmt(char *propmt, void *inputVar, DataType type, int inputSize)
 {
     printf("%s", propmt);
     return takeNInput(inputVar, type, inputSize);
@@ -247,7 +247,7 @@ ReturnCode takeNInputWithPropmt(char* propmt, void* inputVar, DataType type, int
     `char *invalidTypeMessage`:
         Message to print in case return value is ERR_INVALID_TYPE.
     
-    `char* notSupportedMessage`:
+    `char *notSupportedMessage`:
         Message to print in case return value is ERR_DATATYPE_NOT_SUPPORTED.
     
     Returns
@@ -256,10 +256,10 @@ ReturnCode takeNInputWithPropmt(char* propmt, void* inputVar, DataType type, int
 */
 short checkInputValidity(
     ReturnCode returnCode, 
-    char* cannotReadMessage, 
-    char* tooLongMessage, 
-    char* invalidTypeMessage,
-    char* notSupportedMessage
+    char *cannotReadMessage, 
+    char *tooLongMessage, 
+    char *invalidTypeMessage,
+    char *notSupportedMessage
 )
 {
     switch (returnCode)

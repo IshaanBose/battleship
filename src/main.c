@@ -9,14 +9,15 @@ ________________________________________________________________________________
 
     INCLUDES (User-defined)
     -----------------------
-    1. easy_io.h
-    2. player.h
-    3. game.h
+    game.h
 
     FUNCTIONS (Local)
     ----------------
-    1. int main()
-    2. int initMenu()
+    1. int main(void)
+    2. int menuFunctionality(void)
+    3. vod printBanner(void)
+    4. void mainMenu(void)
+    5. void chooseDifficulty(short *difficulty)
 
 *Compiled using C99 standards*
 
@@ -25,19 +26,21 @@ ________________________________________________________________________________
 #include <game.h>
 #include <ctype.h>
 #include <time.h>
-// #include <stack.h>
 
-void initMenu();
-void chooseDifficulty(short* difficulty);
+void menuFunctionality(void);
+void chooseDifficulty(short *difficulty);
 
 int main()
 {
     srand((unsigned int) time(NULL));
-    initMenu();
+    menuFunctionality();
 
     return 0;
 }
 
+/*
+    Prints game banner.
+*/
 void printBanner()
 {
     clearScreen();
@@ -49,12 +52,18 @@ void printBanner()
     printf("==========================================================================\n");
 }
 
+/*
+    Prints the main menu options.
+*/
 void mainMenu()
 {
     printf("\n1. Play PvP\n2. Play PvE\n3. Exit\n");
 }
 
-void initMenu()
+/*
+    Implements the menu functionality.
+*/
+void menuFunctionality()
 {
     while (1)
     {
@@ -116,7 +125,7 @@ void initMenu()
                         }
 
                         int playerTurn = turnChoice == 'y' ? 1 : 2;
-                        setCPUPlayer(true);
+                        setCPUPlayer();
                         setCPUTurn(playerTurn % 2);
 
                         createPlayer(playerTurn == 1 ? 2 : 1, true); // creating CPU player
@@ -156,7 +165,15 @@ void initMenu()
     }
 }
 
-void chooseDifficulty(short* difficulty)
+/*
+    Allows user to choose CPU difficulty.
+
+    Parameter
+    ---------
+    `short *difficulty`:
+        Stores the user's choice of difficulty.
+*/
+void chooseDifficulty(short *difficulty)
 {
     printBanner();
     printf("\nChoose difficulty:\n1. Easy\n2. Hard\n3. Go back\n");

@@ -5,7 +5,36 @@ Author: Ishaan Bose
 Date of Creation: 2021-10-18
 ____________________________________________________________________________________________________________________________________ 
 
+    Contains functions for CPU player operations.
 
+    INCLUDES (user-defined)
+    1. cpu.h
+    2. stack.h
+
+    GLOBAL VARIABLES
+    ----------------
+    1. int  _CPUTurn
+    2. short _lastMove
+    3. struct Stack *_checkout
+    4. int _hitCount
+    5. bool _orientationFlipped
+    6. short _guessOrientation
+
+    FUNCTIONS (global)
+    ------------------
+    1. void setCPUTurn(int turn)
+    2. int getCPUTurn(void)
+    3. void cpuPlaceShips(void)
+    4. bool playCPUTurn(char *moveStatus, Difficulty difficulty)
+    5. void resetCPUVariables()
+    6. void testCPU()
+
+    FUNCTIONS (local)
+    -----------------
+    1. bool playCPUTurnEasy(char *moveStatus)
+    2. bool playCPUTurnHard(char *moveStatus)
+    3. void shuffleArray(int *array, int n)
+    4. char playGuess(int row, int col, char *sunkShip)
 
 *Compiled using C99 standards*
 
@@ -16,57 +45,53 @@ ________________________________________________________________________________
 #include <stdio.h>
 #include <string.h>
 
-int TURN = 0;
+// stores the CPU's turn
+int _CPUTurn = 0;
 
-// for hard difficulty
+/* For hard difficulty */
 
-short lastMove = -1; // stores the position of the last successful hit
-static struct Stack *checkout = NULL;
-int hitCount = 0;
-bool orientationFlipped = false;
+// stores the position of the last successful hit
+short _lastMove = -1;
+// stack that stores cells for the CPU to explore
+struct Stack *_checkout = NULL;
+// counts how many times the CPU has guessed successfully
+int _hitCount = 0;
+// checks whether _guessOrientation has flipped already or not
+bool _orientationFlipped = false;
 /* 
     Direction in which to guess: 
     0 - no saved orientation, 1 - right, -1 - left, 10 - down, -10 - up
 */
-short guessOrientation = 0; 
+short _guessOrientation = 0; 
 
-bool playCPUTurnEasy(char* moveStatus);
-bool playCPUTurnHard(char* moveStatus);
+bool playCPUTurnEasy(char *moveStatus);
+bool playCPUTurnHard(char *moveStatus);
 void shuffleArray(int *array, int n);
 
+/*
+    Used to set CPU's turn.
+
+    Parameter
+    ---------
+    `int turn`:
+        CPU's turn, either 0 or 1.
+*/
 void setCPUTurn(int turn)
 {
-    TURN = turn;
+    _CPUTurn = turn;
 }
 
+/*
+    Returns the CPU turn.
+*/
 int getCPUTurn()
 {
-    return TURN;
+    return _CPUTurn;
 }
 
-void testCPU()
-{
-    setCPUTurn(1);
-    strcpy(players[0].name, "user");
-    cpuPlaceShips();
-    char moveStatus;
-
-    printf("Player board:\n");
-    displayBoard(players[0].board);
-    printf("CPU Board:\n");
-    displayBoard(players[1].board);
-    getchar();
-    
-    while (1)
-    {
-        if (playCPUTurnHard(&moveStatus))
-        {
-            printf("CPU WINS\n");
-            exit(0);
-        }
-    }
-}
-
+/*
+    Randomly places ships on the CPU's board.
+*/
 void cpuPlaceShips()
 {
     Ships ships[] = { CARRIER, BATTLESHIP, DESTROYER, SUBMARINE, PATROL };
@@ -74,7 +99,7 @@ void cpuPlaceShips()
 
     for (int i = 0; i < SHIPS; i++)
     {
-        int shipHP = players[TURN].shipsHP[i];
+        int shipHP = players[_CPUTurn].shipsHP[i];
         
         while (1)
         {
@@ -84,7 +109,7 @@ void cpuPlaceShips()
             {
                 rowStart = rand() % (BOARD_SIZE - shipHP); colStart = rand() % (BOARD_SIZE - shipHP);
 
-                if (players[TURN].board[rowStart][colStart] == ' ')
+                if (players[_CPUTurn].board[rowStart][colStart] == ' ')
                     break;
             }
             
@@ -104,7 +129,7 @@ void cpuPlaceShips()
                     colEnd = colStart + (shipHP - 1);
                 }
 
-                if (players[TURN].board[rowEnd][colEnd] == ' ')
+                if (players[_CPUTurn].board[rowEnd][colEnd] == ' ')
                 {
                     validPositions = true;
                     break;
@@ -127,11 +152,26 @@ void cpuPlaceShips()
         startArr[0] = rowStart; startArr[1] = colStart;
         endArr[0] = rowEnd; endArr[1] = colEnd;
 
-        placeShipOnBoard(TURN + 1, startArr, endArr, ships[i]);
+        placeShipOnBoard(_CPUTurn + 1, startArr, endArr, ships[i]);
     }
 }
 
-bool playCPUTurn(char* moveStatus, Difficulty difficulty)
+/*
+    Plays the CPU's turn.
+
+    Parameters
+    ----------
+    `char *moveStatus`:
+        Used to tell user the status of the CPU's move.
+    
+    `Difficulty difficulty`:
+        Selects the difficulty of the CPU.
+    
+    Returns
+    -------
+    Returns `true` if CPU won, else it returns `false`.
+*/
+bool playCPUTurn(char *moveStatus, Difficulty difficulty)
 {
     switch (difficulty)
     {
@@ -142,32 +182,50 @@ bool playCPUTurn(char* moveStatus, Difficulty difficulty)
     return true;
 }
 
+/*
+    Plays the CPU's guess.
+
+    Parameters
+    ----------
+    `int row`:
+        Row of the guessed cell.
+    
+    `int col`:
+        Column of the guessed cell.
+    
+    `char *sunkShip`:
+        Stores the value of the ship which has sunk, if any.
+    
+    Returns
+    -------
+    Returns 'H' if the guess results in a hit, else it returns 'M'.
+*/
 char playGuess(int row, int col, char *sunkShip)
 {
-    if (players[(TURN + 1) % 2].board[row][col] != ' ') // if CPU hit a ship
+    if (players[(_CPUTurn + 1) % 2].board[row][col] != ' ') // if CPU hit a ship
     {
-        players[TURN].actionBoard[row][col] = 'X';
+        players[_CPUTurn].actionBoard[row][col] = 'X';
 
-        switch (players[(TURN + 1) % 2].board[row][col])
+        switch (players[(_CPUTurn + 1) % 2].board[row][col])
         {
             case 'C':
-                if (--players[(TURN + 1) % 2].shipsHP[CARRIER] == 0 && sunkShip != NULL)
+                if (--players[(_CPUTurn + 1) % 2].shipsHP[CARRIER] == 0 && sunkShip != NULL)
                     *sunkShip = 'C';
                 break;
             case 'B':
-                if (--players[(TURN + 1) % 2].shipsHP[BATTLESHIP] == 0 && sunkShip != NULL)
+                if (--players[(_CPUTurn + 1) % 2].shipsHP[BATTLESHIP] == 0 && sunkShip != NULL)
                     *sunkShip = 'B';
                 break;
             case 'D':
-                if (--players[(TURN + 1) % 2].shipsHP[DESTROYER] == 0 && sunkShip != NULL)
+                if (--players[(_CPUTurn + 1) % 2].shipsHP[DESTROYER] == 0 && sunkShip != NULL)
                     *sunkShip = 'D';
                 break;
             case 'S':
-                if (--players[(TURN + 1) % 2].shipsHP[SUBMARINE] == 0 && sunkShip != NULL)
+                if (--players[(_CPUTurn + 1) % 2].shipsHP[SUBMARINE] == 0 && sunkShip != NULL)
                     *sunkShip = 'S';
                 break;
             case 'P':
-                if (--players[(TURN + 1) % 2].shipsHP[PATROL] == 0 && sunkShip != NULL)
+                if (--players[(_CPUTurn + 1) % 2].shipsHP[PATROL] == 0 && sunkShip != NULL)
                     *sunkShip = 'P';
                 break;
         }
@@ -176,12 +234,24 @@ char playGuess(int row, int col, char *sunkShip)
     }
     else
     {
-        players[TURN].actionBoard[row][col] = 'O';
+        players[_CPUTurn].actionBoard[row][col] = 'O';
         return 'M';
     }
 }
 
-bool playCPUTurnEasy(char* moveStatus)
+/*
+    Plays the CPU turn on easy difficulty. On easy difficulty, the CPU simply randomly guesses.
+
+    Parameter
+    ---------
+    `char *moveStatus`:
+        Stores the status of the guess, either 'H' or 'M'.
+    
+    Returns
+    -------
+    Returns `true` if the CPU wins, else it returns `false`.
+*/
+bool playCPUTurnEasy(char *moveStatus)
 {
     int row, col;
 
@@ -189,37 +259,54 @@ bool playCPUTurnEasy(char* moveStatus)
     {
         row = rand() % 10; col = rand() % 10; // generate a random position on the board
 
-        if (players[TURN].actionBoard[row][col] == ' ') // if CPU hasn't guessed that position yet
+        if (players[_CPUTurn].actionBoard[row][col] == ' ') // if CPU hasn't guessed that position yet
             break;
     }
 
     *moveStatus = playGuess(row, col, NULL);
 
-    return checkWin(TURN);
+    return checkWin(_CPUTurn);
 }
 
 /*
-    Algorithm based on: https://www.datagenetics.com/blog/december32011/index.html (Parity)
-*/
-bool playCPUTurnHard(char* moveStatus)
-{
-    char sunk = '\0';
+    Plays the CPU turn on hard difficulty. Uses a modified version of the algorithm described here: 
+    https://www.datagenetics.com/blog/december32011/index.html (Hunt (with parity)/Target).
     
-    if (checkout == NULL)
-    {
-        checkout = createStack(20);
+    Initially, the CPU randomly guesses odd cells.
+    The modified algorithm uses variable _guessOrientation to track successive hits in order to keep guessing the same direction.
+    If the current orientation results in going out of bounds of the board or if it results in a miss, then the orientation is flipped.
+    _lastMove keeps track of the last successful move. _checkout is a stack that stores the cells adjacent to a successful hit, it is used
+    to take better informed guesses. _hitCount keeps track of how many successful hits the CPU has had, if the CPU sinks a ships, the length
+    of the ship is subtracted from _hitCount, if _hitCount reaches 0, the stack is emptied.
 
-        if (checkout == NULL)
+    Parameter
+    ---------
+    `char *moveStatus`:
+        Stores the status of the guess, either 'H' or 'M'.
+    
+    Returns
+    -------
+    Returns `true` if the CPU wins, else it returns `false`.
+*/
+bool playCPUTurnHard(char *moveStatus)
+{
+    char sunk = '\0'; // variable to check whether the CPU sank a ship
+    
+    if (_checkout == NULL) // create a checkout stack if it doesn't already exist
+    {
+        _checkout = createStack(20);
+
+        if (_checkout == NULL)
         {
             printf("Could not create CPU stack.\n");
             exit(1);
         }
     }
 
-    int row, col;
+    int row, col; // row and column of the current guess
 
-    // if there is no previously stored guessOrientation and stack is empty
-    if (guessOrientation == 0 && isStackEmpty(checkout))
+    // if there is no previously stored _guessOrientation and stack is empty then the CPU will randomly select an odd numbered cell
+    if (_guessOrientation == 0 && isStackEmpty(_checkout))
     {
         while (1)
         {
@@ -228,46 +315,50 @@ bool playCPUTurnHard(char* moveStatus)
             if ((row + col) % 2 == 0) // making sure to only hit odd cells
                 continue;
 
-            if (players[TURN].actionBoard[row][col] == ' ') // if CPU hasn't guessed that position yet
+            if (players[_CPUTurn].actionBoard[row][col] == ' ') // if CPU hasn't guessed that position yet, then stop randomly choosing
                 break;
         }
     }
-    else // if there has been a hit or there is a position to checkout
+    else // if a _guessOrientation had been stored previously
     {
-        // if last guess was a hit and the checkout stack isn't empty and we have a guess orientation, no need to pop from stack
-        if (lastMove != -1 && !isStackEmpty(checkout) && guessOrientation != 0)
+        // if last guess was a hit and the _checkout stack isn't empty and we have a guess orientation, no need to pop from stack
+        if (_lastMove != -1 && !isStackEmpty(_checkout) && _guessOrientation != 0)
         {
-            row = (lastMove + guessOrientation) / 10;
-            col = (lastMove + guessOrientation) % 10;
+            row = (_lastMove + _guessOrientation) / 10;
+            col = (_lastMove + _guessOrientation) % 10;
 
+            // if new cell goes beyond the boundaries of the game board, we try and flip the _guessOrientation
             if (row < 0 || row == BOARD_SIZE || col < 0 || col == BOARD_SIZE)
             {
-                row = lastMove / 10; col = lastMove % 10;
-                guessOrientation = (-guessOrientation);
+                row = _lastMove / 10; col = _lastMove % 10;
+                _guessOrientation = (-_guessOrientation);
                 
+                // keep moving in the flipped orientation until we find an empty cell or a missed cell
                 while (1)
                 {
-                    row = row + (guessOrientation / 10);
-                    col = col + (guessOrientation % 10);
+                    row = row + (_guessOrientation / 10);
+                    col = col + (_guessOrientation % 10);
 
-                    if (players[TURN].actionBoard[row][col] == 'O')
+                    // if the flip results in the finding of a missed cell, then we reset _guessOrientation and play the turn again
+                    if (players[_CPUTurn].actionBoard[row][col] == 'O')
                     {
-                        guessOrientation = 0;
+                        _guessOrientation = 0;
                         return playCPUTurnHard(moveStatus);
                     }
 
-                    if (players[TURN].actionBoard[row][col] == ' ')
+                    if (players[_CPUTurn].actionBoard[row][col] == ' ')
                         break;
                 }
 
-                lastMove = ((row - (guessOrientation / 10)) * 10) + (col - (guessOrientation % 10));
+                // changes _lastMove so that it becomes the position before the missed cell
+                _lastMove = ((row - (_guessOrientation / 10)) * 10) + (col - (_guessOrientation % 10));
             }
         }
         // if last move was a hit and stack isn't empty and we don't have a guess orientation
-        // or if last move was a miss and stack isn't empty
+        // or if last move was a miss and stack isn't empty and _guessOrientation = 0
         else
         {
-            int guessCell = pop(checkout);
+            int guessCell = pop(_checkout);
             row = guessCell / 10; col = guessCell % 10;
         }
     }
@@ -275,24 +366,24 @@ bool playCPUTurnHard(char* moveStatus)
     *moveStatus = playGuess(row, col, &sunk);
 
     int orientations[4] = { 1, -1, 10, -10 };
-    shuffleArray(orientations, 4);
+    shuffleArray(orientations, 4); // shuffles the orientations array
 
     if (*moveStatus == 'H') // if guess resulted in a hit
     {
         short successfulMove = (row * 10) + col;
-        hitCount++;
+        _hitCount++;
 
         if (sunk == '\0')
         {
-            if (!isStackEmpty(checkout))
+            if (!isStackEmpty(_checkout))
             {
-                guessOrientation = successfulMove - lastMove;
+                _guessOrientation = successfulMove - _lastMove;
             }
 
             // then we need to add adjacent cells to stack
             for (int i = 0; i < 4; i++)
             {
-                if (orientations[i] == guessOrientation)
+                if (orientations[i] == _guessOrientation)
                     continue;
                 
                 int adjRow = (successfulMove / 10) + (orientations[i] / 10);
@@ -301,13 +392,13 @@ bool playCPUTurnHard(char* moveStatus)
                 if (adjRow < 0 || adjRow == BOARD_SIZE || adjCol < 0 || adjCol == BOARD_SIZE)
                     continue;
                 
-                if (players[TURN].actionBoard[adjRow][adjCol] != ' ')
+                if (players[_CPUTurn].actionBoard[adjRow][adjCol] != ' ')
                     continue;
                 
-                if (stackContains(checkout, (adjRow * 10) + adjCol))
+                if (stackContains(_checkout, (adjRow * 10) + adjCol))
                     continue;
                 
-                push(checkout, (adjRow * 10) + adjCol);
+                push(_checkout, (adjRow * 10) + adjCol);
             }
         }
         else
@@ -315,85 +406,93 @@ bool playCPUTurnHard(char* moveStatus)
             switch (sunk)
             {
                 case 'C':
-                    hitCount -= 5;
+                    _hitCount -= 5;
                     break;
 
                 case 'B':
-                    hitCount -= 4;
+                    _hitCount -= 4;
                     break;
                 
                 case 'D':
                 case 'S':
-                    hitCount -= 3;
+                    _hitCount -= 3;
                     break;
                 
                 case 'P':
-                    hitCount -= 2;
+                    _hitCount -= 2;
                     break;
             }
 
             sunk = '\0';
 
-            if (hitCount == 0)
+            if (_hitCount == 0)
             {
-                clearStack(checkout);
+                clearStack(_checkout);
             }
 
-            guessOrientation = 0;
+            _guessOrientation = 0;
         }
 
-        lastMove = successfulMove;
+        _lastMove = successfulMove;
     }
     else // if guess resulted in a miss
     {
-        if (!orientationFlipped && guessOrientation != 0)
+        if (!_orientationFlipped && _guessOrientation != 0)
         {
-            guessOrientation = (-guessOrientation);
-            int tempRow = lastMove / 10, tempCol = lastMove % 10;
+            _guessOrientation = (-_guessOrientation);
+            int tempRow = _lastMove / 10, tempCol = _lastMove % 10;
 
             while (1)
             {
-                tempRow += (guessOrientation / 10);
-                tempCol += (guessOrientation % 10);
+                tempRow += (_guessOrientation / 10);
+                tempCol += (_guessOrientation % 10);
 
-                if (players[TURN].actionBoard[tempRow][tempCol] == ' ')
+                if (players[_CPUTurn].actionBoard[tempRow][tempCol] == ' ')
                 {
-                    tempRow -= (guessOrientation / 10);
-                    tempCol -= (guessOrientation % 10);
+                    tempRow -= (_guessOrientation / 10);
+                    tempCol -= (_guessOrientation % 10);
 
-                    lastMove = (tempRow * 10) + tempCol;
+                    _lastMove = (tempRow * 10) + tempCol;
 
                     break;
                 }
-                else if (players[TURN].actionBoard[lastMove / 10][lastMove % 10] == 'O')
+                else if (players[_CPUTurn].actionBoard[_lastMove / 10][_lastMove % 10] == 'O')
                 {
-                    guessOrientation = 0;
+                    _guessOrientation = 0;
                     break;
                 }
             }
 
-            orientationFlipped = true;
+            _orientationFlipped = true;
         }
         else
         {
-            guessOrientation = 0;
-            orientationFlipped = false;
+            _guessOrientation = 0;
+            _orientationFlipped = false;
         }
     }
 
-    return checkWin(TURN);
+    return checkWin(_CPUTurn);
 }
 
 /*
     Function to shuffle an array of n size. Taken from: https://benpfaff.org/writings/clc/shuffle.html
+
+    Parameters
+    ----------
+    `int *array`:
+        Array to shuffle.
+    
+    `int n`:
+        Size of array
 */
-void shuffleArray(int *array, int n)
+void shuffleArray(int *array, int size)
 {
-    if (n > 1)
+    if (size > 1)
     {
-        for (int i = 0; i < n - 1; i++)
+        for (int i = 0; i < size - 1; i++)
         {
-            int j = i + rand() / (RAND_MAX / (n - i) + 1);
+            int j = i + rand() / (RAND_MAX / (size - i) + 1);
             int t = array[j];
             array[j] = array[i];
             array[i] = t;
@@ -401,12 +500,15 @@ void shuffleArray(int *array, int n)
     }
 }
 
+/*
+    Resets all the CPU variables.
+*/
 void resetCPUVariables()
 {
-    destoryStack(checkout);
+    destoryStack(_checkout);
     
-    TURN = 0;
-    lastMove = -1;
-    checkout = NULL;
-    hitCount = 0;
+    _CPUTurn = 0;
+    _lastMove = -1;
+    _checkout = NULL;
+    _hitCount = 0;
 }
