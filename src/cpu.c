@@ -32,6 +32,7 @@ short guessOrientation = 0;
 
 bool playCPUTurnEasy(char* moveStatus);
 bool playCPUTurnHard(char* moveStatus);
+void shuffleArray(int *array, int n);
 
 void setCPUTurn(int turn)
 {
@@ -274,6 +275,7 @@ bool playCPUTurnHard(char* moveStatus)
     *moveStatus = playGuess(row, col, &sunk);
 
     int orientations[4] = { 1, -1, 10, -10 };
+    shuffleArray(orientations, 4);
 
     if (*moveStatus == 'H') // if guess resulted in a hit
     {
@@ -380,6 +382,23 @@ bool playCPUTurnHard(char* moveStatus)
     }
 
     return checkWin(TURN);
+}
+
+/*
+    Function to shuffle an array of n size. Taken from: https://benpfaff.org/writings/clc/shuffle.html
+*/
+void shuffleArray(int *array, int n)
+{
+    if (n > 1)
+    {
+        for (int i = 0; i < n - 1; i++)
+        {
+            int j = i + rand() / (RAND_MAX / (n - i) + 1);
+            int t = array[j];
+            array[j] = array[i];
+            array[i] = t;
+        }
+    }
 }
 
 void resetCPUVariables()
