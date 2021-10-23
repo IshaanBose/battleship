@@ -117,7 +117,7 @@ void cpuPlaceShips()
             bool switched = false;
 
             while (1) // for choosing ending position that has not been already occupied
-            { 
+            {
                 if (vertical)
                 {
                     rowEnd = rowStart + (shipHP - 1);
@@ -142,6 +142,28 @@ void cpuPlaceShips()
                 else // if we have already tried placing ship in both orientation, try again with another start position
                 {
                     break;
+                }
+            }
+
+            // prevents overlapping
+            if (rowStart == rowEnd)
+            {
+                for (int j = colStart; j <= colEnd; j++)
+                {
+                    if (players[_CPUTurn].board[rowStart][j] != ' ')
+                    {
+                        validPositions = false;
+                    }
+                }
+            }
+            else
+            {
+                for (int j = rowStart; j <= rowEnd; j++)
+                {
+                    if (players[_CPUTurn].board[j][colStart] != ' ')
+                    {
+                        validPositions = false;
+                    }
                 }
             }
 

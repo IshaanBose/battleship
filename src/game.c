@@ -192,14 +192,12 @@ bool play(Difficulty difficulty)
         {
             if (playTurn()) // if one of the players win
             {
-                char merged[BOARD_SIZE][BOARD_SIZE];
                 clearScreen();
 
                 for (int i = 0; i < 2; i++)
                 {
-                    printf("%s's board status:\n", players[i].name);
-                    mergeBoards(players[i].board, players[(i + 1) % 2].actionBoard, merged);
-                    displayBoard(merged);
+                    printf("%s's board:\n", players[i].name);
+                    displayBoard(players[i].board);
                     printf("%s's action board:\n", players[i].name);
                     displayBoard(players[i].actionBoard);
                     printf("\n\n");

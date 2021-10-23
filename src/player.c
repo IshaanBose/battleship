@@ -140,7 +140,7 @@ void createPlayer(int playerNum, bool createCPU)
 */
 void displayBoard(char board[BOARD_SIZE][BOARD_SIZE])
 {
-    printf("     A    B    C    D    E    F    G    H    I    J  \n");
+    printf("\n     A    B    C    D    E    F    G    H    I    J  \n");
     printf("   --------------------------------------------------\n");
 
     for (int i = 0; i < BOARD_SIZE; i++)
@@ -242,24 +242,47 @@ bool canPlaceShipOnBoard(int playerNum, char *startingPosition, char *endingPosi
 
     if (players[playerNum - 1].board[startRow][startCol] != ' ')
     {
-        printf("%s is already occupied, please enter another.\n", startingPosition);
+        printf("%s is already occupied, please enter another.\n\n", startingPosition);
         return false;
     }
     if (players[playerNum - 1].board[endRow][endCol] != ' ')
     {
-        printf("%s is already occupied, please enter another.\n", endingPosition);
+        printf("%s is already occupied, please enter another.\n\n", endingPosition);
         return false;
     }
     if ((startRow != endRow) && (startCol != endCol))
     {
-        printf("Cannot place ships diagonally\n");
+        printf("Cannot place ships diagonally\n\n");
         return false;
     }
     if ((endCol - startCol) + 1 != players[playerNum - 1].shipsHP[ship] 
             && (endRow - startRow) + 1 != players[playerNum - 1].shipsHP[ship])
     {
-        printf("Cannot fit ship in given positions.\n");
+        printf("Cannot fit ship in given positions.\n\n");
         return false;
+    }
+
+    if (startRow == endRow)
+    {
+        for (int i = startCol; i <= endCol; i++)
+        {
+            if (players[playerNum - 1].board[startRow][i] != ' ')
+            {
+                printf("Ships cannot overlap.\n\n");
+                return false;
+            }
+        }
+    }
+    else
+    {
+        for (int i = startRow; i <= endRow; i++)
+        {
+            if (players[playerNum - 1].board[i][startCol] != ' ')
+            {
+                printf("Ships cannot overlap.\n\n");
+                return false;
+            }
+        }
     }
 
     startArr[0] = startRow; startArr[1] = startCol;

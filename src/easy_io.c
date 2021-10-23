@@ -264,6 +264,7 @@ short checkInputValidity(
 {
     switch (returnCode)
     {
+        case OK: return (short) 1;
         case ERR_CANNOT_READ:
             if (cannotReadMessage != NULL)
                 printf("%s\n", cannotReadMessage);
@@ -280,7 +281,6 @@ short checkInputValidity(
             if (notSupportedMessage != NULL)
                 printf("%s\n", notSupportedMessage);
             break;
-        case OK: return (short) 1;
     }
 
     return (short) 0;
