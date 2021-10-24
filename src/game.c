@@ -140,14 +140,12 @@ bool play(Difficulty difficulty)
         {
             if (playCPUTurn(&_opponentMove, difficulty)) // if CPU wins
             {
-                char merged[BOARD_SIZE][BOARD_SIZE];
                 clearScreen();
 
                 for (int i = 0; i < 2; i++)
                 {
                     printf("%s's board status:\n", players[i].name);
-                    mergeBoards(players[i].board, players[(i + 1) % 2].actionBoard, merged);
-                    displayBoard(merged);
+                    displayBoard(players[i].board);
                     printf("%s's action board:\n", players[i].name);
                     displayBoard(players[i].actionBoard);
                     printf("\n\n");
