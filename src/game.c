@@ -144,7 +144,7 @@ bool play(Difficulty difficulty)
 
                 for (int i = 0; i < 2; i++)
                 {
-                    printf("%s's board status:\n", players[i].name);
+                    printf("%s's board:\n", players[i].name);
                     displayBoard(players[i].board);
                     printf("%s's action board:\n", players[i].name);
                     displayBoard(players[i].actionBoard);
