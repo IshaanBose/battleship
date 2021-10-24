@@ -287,6 +287,15 @@ short checkInputValidity(
 }
 
 /*
+    Clears the stdin buffer.
+*/
+void clearInputBuffer()
+{
+    int dump;
+    while ((dump = getchar()) != '\n' && dump != EOF);
+}
+
+/*
     This function clears the console. Works for both Windows and Linux systems.
 */
 void clearScreen()

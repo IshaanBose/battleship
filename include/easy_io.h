@@ -22,8 +22,9 @@ ________________________________________________________________________________
     2. ReturnCode takeNInput(void *inputVar, DataType type, int inputSize)
     3. ReturnCode takeInputWithPropmt(char *propmt, void *inputVar, DataType type)
     4. ReturnCode takeNInputWithPropmt(char *propmt, void *inputVar, DataType type, int inputSize)
-    5. void clearScreen(void)
-    6. short checkInputValidity(
+    5. void clearInputBuffer(void)
+    6. void clearScreen(void)
+    7. short checkInputValidity(
             ReturnCode returnCode, 
             char *cannotReadMessage, 
             char *tooLongMessage, 
@@ -59,6 +60,7 @@ ReturnCode takeInput(void *inputVar, DataType type);
 ReturnCode takeNInput(void *inputVar, DataType type, int inputSize);
 ReturnCode takeInputWithPropmt(char *propmt, void *inputVar, DataType type);
 ReturnCode takeNInputWithPropmt(char *propmt, void *inputVar, DataType type, int inputSize);
+void clearInputBuffer(void);
 void clearScreen(void);
 short checkInputValidity(
     ReturnCode returnCode, 

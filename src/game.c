@@ -88,7 +88,7 @@ bool start(int playerTurn, Difficulty difficulty)
         placeShips();
         displayBoard(players[_playerTurn - 1].board);
 
-        printf("All ships placed! Press any key to continue...");
+        printf("All ships placed! Press ENTER to continue...");
         getchar();
         clearScreen();
     }
@@ -105,8 +105,10 @@ bool start(int playerTurn, Difficulty difficulty)
             else
                 printf("\nAll ships placed! Give computer back to player 1 so the game can begin!\n");
 
-            printf("Press any key to continue...");
+            printf("Press ENTER to continue...");
             getchar();
+            clearInputBuffer();
+
             clearScreen();
         }
 
@@ -395,8 +397,9 @@ bool playTurn()
         printf("You sunk their %s!\n", sunkenShip);
     }
 
-    printf("Press key to let player %d play...", ((playerTurn + 1) % 2) + 1);
+    printf("Press ENTER to let player %d play...", ((playerTurn + 1) % 2) + 1);
     getchar();
+    clearInputBuffer();
 
     return false;
 }
